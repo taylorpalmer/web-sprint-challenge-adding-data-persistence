@@ -23,4 +23,21 @@ router.post("/projects", async (req, res, next) => {
   }
 });
 
+router.get("/projects/:id/resources", async (req, res, next) => {
+  try {
+    const resources = await findResources(req.params.id);
+    res.json(resources);
+  } catch (err) {
+    next(err);
+  }
+});
+
+function findResources(id) {
+  return db("project_resources as pr")
+    .innerJoin("projects as p", "p.id", "pr.project_id")
+    .innerJoin("resources as r", "r.id", "pr.resource_id")
+    .where("p.id", id)
+    .select("r.id", "r.name");
+}
+
 module.exports = router;
